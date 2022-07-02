@@ -2,10 +2,11 @@ from datetime import datetime
 from django.utils.timesince import timesince
 from rest_framework import serializers
 
-from news.models import Article
+from news.models import Article, Journalist
 
 class ArticleSerializer(serializers.ModelSerializer): #model serializer automatically populates the field of model. Check definition for more.
     time_since_publication = serializers.SerializerMethodField()
+    # author = JournalistSerialzier()
     class Meta:
         model = Article 
         exclude = ('id',)
@@ -28,6 +29,15 @@ class ArticleSerializer(serializers.ModelSerializer): #model serializer automati
         if len(value) < 20:
             raise serializers.ValidationError('Title should be at least 60 characters long')
         return value
+
+class JournalistSerialzer(serializers.ModelSerializer):
+    articles = serializers.HyperlinkedRelatedField(many=True,read_only=True, view_name='article-detail') #get url endpoints of article detail
+    # articles = ArticleSerializer(many=True,read_only=True)
+    class Meta:
+        model = Journalist
+        fields = '__all__'
+
+
 
 # class ArticleSerializer(serializers.Serializer):
 #     id = serializers.IntegerField(read_only=True)
